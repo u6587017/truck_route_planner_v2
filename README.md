@@ -21,6 +21,6 @@
 ![export](https://github.com/user-attachments/assets/cab7b66c-8593-49b9-8d05-2cfbbced852a)<br/>
 ![exc](https://github.com/user-attachments/assets/39a8eb33-7c0d-4864-a889-e082b90805f2)<br />
 ### 5 CtkOptionMenu:
-- หลังจากที่เรา Generate HTML Map เราจะสามารถเลือกกรองแค่เส้นทางของรถคันนั้น ๆ ได้ตามจำนวนรถทั้งหมด โดยหากทำการเลือก Truck 1 ก็จะแสดงผลเส้นทางเพียงแค่ Truck 1
+- หลังจากที่เรา Generate HTML Map เราจะสามารถเลือกกรองแค่เส้นทางของรถคันนั้น ๆ ได้ตามจำนวนรถทั้งหมด โดยหากทำการเลือก Truck 1 ก็จะแสดงผลเส้นทางเพียงแค่ Truck 1<br />
 ![tru](https://github.com/user-attachments/assets/93c007e6-6747-4bf4-a4f1-57e2f08313fb)<br />
 ![tru1](https://github.com/user-attachments/assets/1d07ba10-999f-4745-a0fc-7ad1c0b67e1a)
