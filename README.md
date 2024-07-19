@@ -6,12 +6,18 @@
 <br />
 ## การใช้งาน ต้องตามตามลำดับขึ้นดังนี้
 ### 1 OpenRouteService API Key
-ให้ผู้ใช้ใส่ API Key ของ OpenRouteService โดยเข้าไปที่ลิงค์นี้ https://api.openrouteservice.org/ และทำการสมัครโดยสามารถหา API Key ได้ดังภาพด้านล่างนี้
+- การจะใช้งานโปรแกรมได้ให้ผู้ใช้ใส่ API Key ของ OpenRouteService โดยเข้าไปที่ลิงค์นี้ https://api.openrouteservice.org/ และทำการสมัครโดยสามารถหา API Key ได้ดังภาพด้านล่างนี้
 ![key](https://github.com/user-attachments/assets/48e41a09-fccb-46f4-a97e-4983b5d5779b)<br/>
-### 2 Select Excel:
-- โหลดข้อมูลจากไฟล์ Excel .xlxs ซึ่งจะแสดงชื่อไฟล์ที่ทำการเลือกปัจจุบันด้านล่าง จากนั้นจะมีการการแสดงผลบนแผนที่เป็นไฟล์ HTML ซึ่งจะแสดงเส้นทางรถบรรทุกที่วางแผนไว้บนแผนที่มีการแสดงผลเส้นทางด้วยสี โดยแต่ละสีคือรถบรรทุกแต่ละคัน
+### 2 Select Excel File:
+- หลังจากใส่ API Key เรียบร้อยแล้ว ให้เราโหลดข้อมูลจากไฟล์ Excel .xlxs ซึ่งจะแสดงชื่อไฟล์ที่ทำการเลือกปัจจุบันด้านล่าง จากนั้นจะมีการการแสดงผลบนแผนที่เป็นไฟล์ HTML ซึ่งจะแสดงเส้นทางรถบรรทุกที่วางแผนไว้บนแผนที่มีการแสดงผลเส้นทางด้วยสี โดยแต่ละสีคือรถบรรทุกแต่ละคัน
+![sel](https://github.com/user-attachments/assets/6fb2f01e-7da6-44d9-9186-0133bb856a01)<br/>
+![gen](https://github.com/user-attachments/assets/de03ffae-d6a1-4cd4-8e17-5c37fa8f6bc3)<br/>
 ![key2](https://github.com/user-attachments/assets/74576b16-e713-443d-b99f-0bdb2a479fdb)<br/>
-### 3 Export Excel: 
-- Export ไฟล์เป็น excel โดยในแต่ละ sheet จะเป็น order ของรถบรรทุกแต่ละคัน
-### 4 CtkOptionMenu:
+### 3 Generate HTML Map
+- หลังจาก Select Excel ให้ทำการกดปุ่ม Generate HTML Map
+![map](https://github.com/user-attachments/assets/1e26de10-ada6-4525-83d9-56a62417b530)
+### 4 Export Excel: 
+- หลังจาก Select Excel จะสามารถ Export ไฟล์เป็น excel โดยในแต่ละ sheet จะเป็นข้อมูล order ของรถบรรทุกแต่ละคัน
+![export](https://github.com/user-attachments/assets/cab7b66c-8593-49b9-8d05-2cfbbced852a)<br/>
+### 5 CtkOptionMenu:
 - หลังจากเลือกแล้ว
