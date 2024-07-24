@@ -15,7 +15,6 @@
 ### 3 Generate HTML Map
 - หลังจาก Select Excel ให้ทำการกดปุ่ม Generate HTML Map
 ![ors](https://github.com/user-attachments/assets/91f0628f-4d20-4dba-838f-de75216078ca)<br/>
-![map](https://github.com/user-attachments/assets/1e26de10-ada6-4525-83d9-56a62417b530)
 ### 4 Export Excel: 
 - หลังจาก Select Excel จะสามารถ Export ไฟล์เป็น excel โดยในแต่ละ sheet จะเป็นข้อมูล order ของรถบรรทุกแต่ละคัน
 ![export](https://github.com/user-attachments/assets/cab7b66c-8593-49b9-8d05-2cfbbced852a)<br/>
@@ -23,9 +22,9 @@
 ### 5 CtkOptionMenu:
 - หลังจากที่เรา Generate HTML Map เราจะสามารถเลือกกรองแค่เส้นทางของรถคันนั้น ๆ ได้ตามจำนวนรถทั้งหมด โดยหากทำการเลือก Truck 1 ก็จะแสดงผลเส้นทางเพียงแค่ Truck 1<br />
 ![tru](https://github.com/user-attachments/assets/93c007e6-6747-4bf4-a4f1-57e2f08313fb)<br />
-![tru1](https://github.com/user-attachments/assets/1d07ba10-999f-4745-a0fc-7ad1c0b67e1a)
+![Screenshot 2024-07-24 130930](https://github.com/user-attachments/assets/a3f5a243-34f4-43d7-864d-346fb513e937)
 
 ## ข้อจำกัด
 - 1. หากลูกค้ามีการปักหมุด lat lng ที่ไม่ใกล้เคียงถนน จะทำให้โปรแกรมไม่สามารถหาเส้นทางที่ไปยังจุดนั้น ๆ ได้จะทำให้เกิด Bug ที่จะไม่แสดงเส้นทางและเวลาของรถบรรทุกคันที่บรรทุก order ชิ้นนั้น ๆ
 - 2. OpenRouteService ยังไม่มีการนำเอาสภาพการจราจรเข้ามาเป็น Factor ในการคิดคำนวณเวลา ETA ทำให้มีโอกาสที่เวลาจะคลาดเคลื่อน 
-  3.  
+- 3. ยังไม่สามารถจำกัดเวลาให้อยู่ในช่วงก่อน 19:00 น. ได้
