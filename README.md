@@ -14,7 +14,7 @@
 ![key2](https://github.com/user-attachments/assets/74576b16-e713-443d-b99f-0bdb2a479fdb)<br/>
 ### 3 Generate HTML Map
 - หลังจาก Select Excel ให้ทำการกดปุ่ม Generate HTML Map
-![gen](https://github.com/user-attachments/assets/de03ffae-d6a1-4cd4-8e17-5c37fa8f6bc3)<br/>
+![ors](https://github.com/user-attachments/assets/91f0628f-4d20-4dba-838f-de75216078ca)<br/>
 ![map](https://github.com/user-attachments/assets/1e26de10-ada6-4525-83d9-56a62417b530)
 ### 4 Export Excel: 
 - หลังจาก Select Excel จะสามารถ Export ไฟล์เป็น excel โดยในแต่ละ sheet จะเป็นข้อมูล order ของรถบรรทุกแต่ละคัน
