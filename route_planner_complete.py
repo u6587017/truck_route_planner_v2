@@ -10,7 +10,7 @@ import webbrowser
 from jinja2 import Template, Environment
 from datetime import datetime, timedelta
 import customtkinter as ctk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import os
 import geopy.distance
 
@@ -123,25 +123,35 @@ def optimize_route(client, source, orders, max_distance=6000000, radiuses=3000, 
 
     return optimized_routes, reordered_orders
 
-# Calculate estimated time of arrival
-def calculate_eta(optimized_routes, start_time):
-    print("Calculating ETA...")
+# Calculate estimated time of arrival and cumulative distance
+def calculate_eta_and_distance(optimized_routes, start_time):
+    print("Calculating ETA and distance...")
     eta = []
     current_time = start_time
+    cumulative_distance = 0
+    distances = []
+
     for optimized_route in optimized_routes:
         for segment in optimized_route['features'][0]['properties']['segments']:
             current_time += timedelta(seconds=segment['duration'])
             eta.append(current_time.strftime('%H:%M'))
-    return eta
+            distance = segment['distance'] / 1000  # Convert meters to kilometers
+            cumulative_distance += distance
+            distances.append(f"{cumulative_distance:.2f}")
+    
+    return eta, distances
 
 # Create map with polylines
-def create_map(route, eta, map_obj, color, orders, truck_id):
+def create_map(route, eta, distances, map_obj, color, orders, truck_id):
     print("Creating map...")
+    valid_colors = {'green', 'cadetblue', 'beige', 'purple', 'lightred', 'blue', 'white', 'lightgreen', 'gray', 'lightgray', 'black', 'pink', 'orange', 'darkgreen', 'darkred', 'darkblue', 'red', 'lightblue', 'darkpurple'}
+    color = color if color in valid_colors else 'blue'
+    
     if route:
         folium.Marker(location=[route[0][1], route[0][0]], popup="Start", icon=folium.Icon(color=color)).add_to(map_obj)
     
     for i, order in enumerate(orders):
-        popup_text = f"Order: {order['Order Number']}<br>Destination: {order['Geo District']}<br>Weight: {order['Total weights per order']}<br>ETA: {eta[i] if i < len(eta) else 'N/A'}"
+        popup_text = f"Order: {order['Order Number']}<br>Destination: {order['Geo District']}<br>Weight: {order['Total weights per order']}<br>ETA: {eta[i] if i < len(eta) else 'N/A'}<br>Distance: {distances[i]} km"
         folium.Marker(location=[order['Lat'], order['Lng']], popup=popup_text, icon=plugins.BeautifyIcon(
                             icon="arrow-down", icon_shape="marker",
                             number=str(i+1),
@@ -152,7 +162,7 @@ def create_map(route, eta, map_obj, color, orders, truck_id):
         polyline.add_to(map_obj)
 
 # Create sidebar with order details
-def create_sidebar(trucks, all_eta, colors):
+def create_sidebar(trucks, all_eta, all_distances, colors):
     print("Creating sidebar...")
     sidebar_html = """
     <div id="sidebar" style="position: fixed; top: 10px; left: 10px; width: 350px; height: 90%; overflow: auto; background: white; padding: 10px; border: 1px solid #000; z-index:9999;">
@@ -168,6 +178,7 @@ def create_sidebar(trucks, all_eta, colors):
                     <th style="border: 1px solid #000;">Destination</th>
                     <th style="border: 1px solid #000;">Weight</th>
                     <th style="border: 1px solid #000;">ETA</th>
+                    <th style="border: 1px solid #000;">Distance (km)</th>
                 </tr>
                 {% for order_idx, order in enumerate(truck) %}
                     <tr>
@@ -176,6 +187,7 @@ def create_sidebar(trucks, all_eta, colors):
                         <td style="border: 1px solid #000;">{{ order['Geo District'] }}</td>
                         <td style="border: 1px solid #000;">{{ order['Total weights per order'] }}</td>
                         <td style="border: 1px solid #000;" id="truck{{ truck_idx }}_eta_{{ order_idx }}">{{ all_eta[truck_idx][order_idx] if order_idx < len(all_eta[truck_idx]) else 'N/A' }}</td>
+                        <td style="border: 1px solid #000;">{{ all_distances[truck_idx][order_idx] if order_idx < len(all_distances[truck_idx]) else 'N/A' }}</td>
                     </tr>
                 {% endfor %}
             </table>
@@ -185,11 +197,11 @@ def create_sidebar(trucks, all_eta, colors):
     env = Environment()
     env.globals.update({'len': len})
     template = env.from_string(sidebar_html)
-    return template.render(trucks=list(enumerate(trucks)), all_eta=all_eta, colors=colors, enumerate=enumerate)
+    return template.render(trucks=list(enumerate(trucks)), all_eta=all_eta, all_distances=all_distances, colors=colors, enumerate=enumerate)
 
 # Main function to generate HTML map
-def main_generate_html(file_path, ors_api_key):
-    global trucks, all_eta, colors, folium_colors
+def main_generate_html(file_path, ors_api_key, start_time_str):
+    global trucks, all_eta, all_distances, colors, folium_colors
     # Check if the API key is provided
     if not ors_api_key:
         print("API key is missing. Please provide a valid OpenRouteService API key.")
@@ -211,11 +223,14 @@ def main_generate_html(file_path, ors_api_key):
     main_map = folium.Map(location=[source[0], source[1]], zoom_start=12, control_scale=True)
     
     # Define colors and corresponding color codes for different trucks
-    colors = ['#0000FF', '#008000', '#FF0000', '#800080', '#FFA500', '#8B0000', '#FF6347', '#F5F5DC', '#00008B', '#006400', '#5F9EA0', '#4B0082', '#FFC0CB', '#ADD8E6', '#90EE90', '#808080', '#000000']
-    folium_colors = {'#0000FF', '#008000', '#FF0000', '#800080', '#FFA500', '#8B0000', '#FF6347', '#F5F5DC', '#00008B', '#006400', '#5F9EA0', '#4B0082', '#FFC0CB', '#ADD8E6', '#90EE90', '#808080', '#000000'}
+    colors = ['blue', 'green', 'red', 'purple', 'orange', 'darkgreen', 'darkred', 'darkblue', 'lightblue', 'cadetblue', 'lightgreen', 'gray', 'black', 'pink', 'beige', 'lightred', 'lightgray', 'white']
+    folium_colors = {'blue', 'green', 'red', 'purple', 'orange', 'darkgreen', 'darkred', 'darkblue', 'lightblue', 'cadetblue', 'lightgreen', 'gray', 'black', 'pink', 'beige', 'lightred', 'lightgray', 'white'}
     
     all_eta = []
-    start_time = datetime.strptime("11:00", "%H:%M")
+    all_distances = []
+    
+    # Convert start time string to datetime object
+    start_time = datetime.strptime(start_time_str, "%H:%M")
     
     trucks_with_eta = []
     trucks_without_eta = []
@@ -224,18 +239,19 @@ def main_generate_html(file_path, ors_api_key):
     for i, truck in enumerate(trucks):
         optimized_routes, reordered_truck = optimize_route(client, source, pd.DataFrame(truck))
         if optimized_routes:
-            eta = calculate_eta(optimized_routes, start_time)
+            eta, distances = calculate_eta_and_distance(optimized_routes, start_time)
             all_eta.append(eta)
+            all_distances.append(distances)
             trucks_with_eta.append(reordered_truck)
         else:
             trucks_without_eta.extend(truck)
             all_eta.append(['N/A'] * len(truck))
+            all_distances.append(['N/A'] * len(truck))
         
         for optimized_route in optimized_routes:
             route = optimized_route['features'][0]['geometry']['coordinates']
             color = colors[i % len(colors)]
-            color = color if color in folium_colors else '#0000FF'
-            create_map(route, eta[:len(reordered_truck)], main_map, color, reordered_truck, i)
+            create_map(route, eta[:len(reordered_truck)], distances[:len(reordered_truck)], main_map, color, reordered_truck, i)
     
     # Reprocess trucks without ETA
     if trucks_without_eta:
@@ -243,20 +259,21 @@ def main_generate_html(file_path, ors_api_key):
         trucks_without_eta_df = pd.DataFrame(trucks_without_eta)
         optimized_routes, reordered_truck = optimize_route(client, source, trucks_without_eta_df, profile='driving-car')
         if optimized_routes:
-            eta = calculate_eta(optimized_routes, start_time)
+            eta, distances = calculate_eta_and_distance(optimized_routes, start_time)
             all_eta.append(eta)
+            all_distances.append(distances)
             trucks_with_eta.append(reordered_truck)
         else:
             all_eta.append(['N/A'] * len(trucks_without_eta_df))
+            all_distances.append(['N/A'] * len(trucks_without_eta_df))
 
         for optimized_route in optimized_routes:
             route = optimized_route['features'][0]['geometry']['coordinates']
             color = colors[len(trucks_with_eta) % len(colors)]
-            color = color if color in folium_colors else '#0000FF'
-            create_map(route, eta[:len(reordered_truck)], main_map, color, reordered_truck, len(trucks_with_eta))
+            create_map(route, eta[:len(reordered_truck)], distances[:len(reordered_truck)], main_map, color, reordered_truck, len(trucks_with_eta))
     
     # Add sidebar with order details
-    sidebar_html = create_sidebar(trucks_with_eta, all_eta, colors)
+    sidebar_html = create_sidebar(trucks_with_eta, all_eta, all_distances, colors)
     main_map.get_root().html.add_child(folium.Element(sidebar_html))
     
     # Save and open the main map
@@ -274,7 +291,6 @@ def generate_truck_map(selected_truck):
         truck_idx = int(selected_truck.split()[1]) - 1
         truck = trucks[truck_idx]
         color = colors[truck_idx % len(colors)]
-        color = color if color in folium_colors else '#0000FF'
         
         # Static source coordinates
         source = [14.0828151, 100.6258423]  # Note: lat, lng
@@ -282,14 +298,14 @@ def generate_truck_map(selected_truck):
         truck_map = folium.Map(location=[source[0], source[1]], zoom_start=12, control_scale=True)
         
         optimized_routes, reordered_truck = optimize_route(openrouteservice.Client(key=entry_api_key.get()), source, pd.DataFrame(truck))
-        eta = calculate_eta(optimized_routes, datetime.strptime("11:00", "%H:%M")) if optimized_routes else ['N/A'] * len(truck)
+        eta, distances = calculate_eta_and_distance(optimized_routes, datetime.strptime(entry_start_time.get(), "%H:%M")) if optimized_routes else (['N/A'] * len(truck), ['N/A'] * len(truck))
         
         for optimized_route in optimized_routes:
             route = optimized_route['features'][0]['geometry']['coordinates']
-            create_map(route, eta[:len(reordered_truck)], truck_map, color, reordered_truck, truck_idx)
+            create_map(route, eta[:len(reordered_truck)], distances[:len(reordered_truck)], truck_map, color, reordered_truck, truck_idx)
         
         # Add sidebar with order details for specific truck
-        sidebar_html = create_sidebar([reordered_truck], [eta], [color])
+        sidebar_html = create_sidebar([reordered_truck], [eta], [distances], [color])
         truck_map.get_root().html.add_child(folium.Element(sidebar_html))
         
         print("Saving truck map...")
@@ -301,9 +317,28 @@ def export_to_excel(file_path, output_path):
     df = read_excel(file_path)
     trucks = sort_orders_into_trucks(df)
     
-    with pd.ExcelWriter(output_path) as writer:
+    all_eta = []
+    all_distances = []
+    start_time = datetime.strptime(entry_start_time.get(), "%H:%M")
+    
+    client = openrouteservice.Client(key=entry_api_key.get())
+    source = [14.0828151, 100.6258423]
+    
+    for truck in trucks:
+        optimized_routes, reordered_truck = optimize_route(client, source, pd.DataFrame(truck))
+        if optimized_routes:
+            eta, distances = calculate_eta_and_distance(optimized_routes, start_time)
+        else:
+            eta = ['N/A'] * len(truck)
+            distances = ['N/A'] * len(truck)
+        all_eta.append(eta)
+        all_distances.append(distances)
+    
+    with pd.ExcelWriter(output_path, engine='xlsxwriter') as writer:
         for i, truck in enumerate(trucks):
             truck_df = pd.DataFrame(truck)
+            truck_df['ETA'] = all_eta[i]
+            truck_df['Distance (km)'] = all_distances[i]
             truck_df.to_excel(writer, sheet_name=f'Truck {i+1}', index=False)
 
 # UI with customTkinter
@@ -319,10 +354,16 @@ def generate_html():
     all_eta = []
     if file_path:
         ors_api_key = entry_api_key.get()
-        if ors_api_key:
-            main_generate_html(file_path, ors_api_key)
+        start_time_str = entry_start_time.get()
+        if ors_api_key and start_time_str:
+            try:
+                datetime.strptime(start_time_str, "%H:%M")
+            except ValueError:
+                messagebox.showerror("Invalid Time Format", "Please enter a valid start time in HH:MM format.")
+                return
+            main_generate_html(file_path, ors_api_key, start_time_str)
         else:
-            print("Please provide a valid OpenRouteService API key.")
+            print("Please provide a valid OpenRouteService API key and start time.")
 
 def export_excel():
     if file_path:
@@ -332,7 +373,7 @@ def export_excel():
 
 # Initialize UI
 app = ctk.CTk()
-app.geometry("400x400")
+app.geometry("400x500")
 app.title("Truck Route Planner")
 
 file_path = ""
@@ -342,6 +383,12 @@ label_api_key.pack(pady=10)
 
 entry_api_key = ctk.CTkEntry(app, width=300)
 entry_api_key.pack(pady=5)
+
+label_start_time = ctk.CTkLabel(app, text="Start Time (HH:MM):")
+label_start_time.pack(pady=10)
+
+entry_start_time = ctk.CTkEntry(app, width=300)
+entry_start_time.pack(pady=5)
 
 button_select_file = ctk.CTkButton(app, text="Select Excel File", command=select_file)
 button_select_file.pack(pady=10)
