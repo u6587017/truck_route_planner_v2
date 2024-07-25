@@ -10,7 +10,7 @@ import webbrowser
 from jinja2 import Template, Environment
 from datetime import datetime, timedelta
 import customtkinter as ctk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import os
 import geopy.distance
 
@@ -101,19 +101,19 @@ def optimize_route(client, source, orders, max_distance=6000000, radiuses=3000, 
     optimized_routes = []
     for chunk in chunks:
         try:
-            optimized_route = client.directions(coordinates=chunk, profile=profile, format='geojson', radiuses=radiuses)
+            optimized_route = client.directions(coordinates=chunk, profile=profile, format='geojson', radiuses=radiases)
             optimized_routes.append(optimized_route)
         except openrouteservice.exceptions.ApiError as e:
             if 'rate limit' in str(e).lower():
                 print("Rate limit exceeded, waiting for 60 seconds before retrying...")
                 time.sleep(60)
-                return optimize_route(client, source, orders, max_distance, radiuses, profile)
+                return optimize_route(client, source, orders, max_distance, radiases, profile)
             elif '2010' in str(e):  # Handle specific error for routable point
-                if radiuses <= 3:
-                    print(f"Radius {radiuses} too low, skipping optimization for this chunk.")
+                if radiases <= 3:
+                    print(f"Radius {radiases} too low, skipping optimization for this chunk.")
                     continue
-                print(f"Error with radius {radiuses}, reducing radius and retrying...")
-                return optimize_route(client, source, orders, max_distance, radiuses // 10, profile)
+                print(f"Error with radius {radiases}, reducing radius and retrying...")
+                return optimize_route(client, source, orders, max_distance, radiases // 10, profile)
             elif '2009' in str(e):  # Handle specific error for route not found
                 print(f"Route could not be found: {e}")
                 continue
@@ -128,10 +128,16 @@ def calculate_eta(optimized_routes, start_time):
     print("Calculating ETA...")
     eta = []
     current_time = start_time
+    max_eta_time = start_time.replace(hour=19, minute=0)
+    
     for optimized_route in optimized_routes:
         for segment in optimized_route['features'][0]['properties']['segments']:
+            if current_time > max_eta_time:
+                return eta
             current_time += timedelta(seconds=segment['duration'])
+            current_time += timedelta(seconds=1800)  # Add 30 minutes
             eta.append(current_time.strftime('%H:%M'))
+    
     return eta
 
 # Create map with polylines
@@ -188,7 +194,7 @@ def create_sidebar(trucks, all_eta, colors):
     return template.render(trucks=list(enumerate(trucks)), all_eta=all_eta, colors=colors, enumerate=enumerate)
 
 # Main function to generate HTML map
-def main_generate_html(file_path, ors_api_key):
+def main_generate_html(file_path, ors_api_key, start_time_str):
     global trucks, all_eta, colors, folium_colors
     # Check if the API key is provided
     if not ors_api_key:
@@ -215,7 +221,9 @@ def main_generate_html(file_path, ors_api_key):
     folium_colors = {'#0000FF', '#008000', '#FF0000', '#800080', '#FFA500', '#8B0000', '#FF6347', '#F5F5DC', '#00008B', '#006400', '#5F9EA0', '#4B0082', '#FFC0CB', '#ADD8E6', '#90EE90', '#808080', '#000000'}
     
     all_eta = []
-    start_time = datetime.strptime("11:00", "%H:%M")
+    
+    # Convert start time string to datetime object
+    start_time = datetime.strptime(start_time_str, "%H:%M")
     
     trucks_with_eta = []
     trucks_without_eta = []
@@ -282,7 +290,7 @@ def generate_truck_map(selected_truck):
         truck_map = folium.Map(location=[source[0], source[1]], zoom_start=12, control_scale=True)
         
         optimized_routes, reordered_truck = optimize_route(openrouteservice.Client(key=entry_api_key.get()), source, pd.DataFrame(truck))
-        eta = calculate_eta(optimized_routes, datetime.strptime("11:00", "%H:%M")) if optimized_routes else ['N/A'] * len(truck)
+        eta = calculate_eta(optimized_routes, datetime.strptime(entry_start_time.get(), "%H:%M")) if optimized_routes else ['N/A'] * len(truck)
         
         for optimized_route in optimized_routes:
             route = optimized_route['features'][0]['geometry']['coordinates']
@@ -319,10 +327,16 @@ def generate_html():
     all_eta = []
     if file_path:
         ors_api_key = entry_api_key.get()
-        if ors_api_key:
-            main_generate_html(file_path, ors_api_key)
+        start_time_str = entry_start_time.get()
+        if ors_api_key and start_time_str:
+            try:
+                datetime.strptime(start_time_str, "%H:%M")
+            except ValueError:
+                messagebox.showerror("Invalid Time Format", "Please enter a valid start time in HH:MM format.")
+                return
+            main_generate_html(file_path, ors_api_key, start_time_str)
         else:
-            print("Please provide a valid OpenRouteService API key.")
+            print("Please provide a valid OpenRouteService API key and start time.")
 
 def export_excel():
     if file_path:
@@ -332,7 +346,7 @@ def export_excel():
 
 # Initialize UI
 app = ctk.CTk()
-app.geometry("400x400")
+app.geometry("400x500")
 app.title("Truck Route Planner")
 
 file_path = ""
@@ -342,6 +356,12 @@ label_api_key.pack(pady=10)
 
 entry_api_key = ctk.CTkEntry(app, width=300)
 entry_api_key.pack(pady=5)
+
+label_start_time = ctk.CTkLabel(app, text="Start Time (HH:MM):")
+label_start_time.pack(pady=10)
+
+entry_start_time = ctk.CTkEntry(app, width=300)
+entry_start_time.pack(pady=5)
 
 button_select_file = ctk.CTkButton(app, text="Select Excel File", command=select_file)
 button_select_file.pack(pady=10)
