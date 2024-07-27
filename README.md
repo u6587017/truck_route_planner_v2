@@ -2,8 +2,11 @@
 แอปพลิเคชันนี้ช่วยให้ผู้ใช้สามารถเลือกไฟล์ Excel ที่มีข้อมูลคำสั่งซื้อ ประมวลผลข้อมูลเพื่อกำหนดเส้นทางที่มีประสิทธิภาพที่สุด และแสดงผลเส้นทางเหล่านี้บนแผนที่ นอกจากนี้ผู้ใช้ยังสามารถส่งออกเส้นทางที่วางแผนไว้ไปยังไฟล์ Excel ได้ ซึ่งเป็นการใช้ OpenRouteService (ORS) API มาใช้ในการคำนวณระยะทางและ ETA
 โดยการใช้งานสามารถเข้าได้ด้วยไฟล์ exe ดังรูปนี้ <br />
 ## Update 2.2
-- เพิ่มการใส่เวลารถออก โดยผู้ใช้ต้องทำการใส่เวลาที่รถออกเป็น format เช่น 10:30 หรือ 11:30 เป็นต้น
+- เพิ่มการใส่เวลารถออก โดยผู้ใช้ต้องทำการใส่เวลาที่รถออกเป็น format เช่น 10:30 หรือ 11:30 เป็นต้น <br />
+![Screenshot 2024-07-27 153330](https://github.com/user-attachments/assets/5d6d7a88-fa33-42a0-bd4d-3cb90a9da6b6)
+<br />
 - เพิ่ม Cummulative Distance และ Estimated time arrival (ETA) บน sidebar และในไฟล์ Excel ที่ Export<br />
+![Screenshot 2024-07-27 153206](https://github.com/user-attachments/assets/c19d2253-05d3-4fff-b1d8-0b135d689407)<br />
 ![icon](https://github.com/user-attachments/assets/151ccd08-ee57-4d4c-8076-f6ade0807c13)<br/>
 ![Screenshot 2024-07-27 152717](https://github.com/user-attachments/assets/dab84804-ec52-4d34-9e26-b62b3c4793ab)
 <br />
