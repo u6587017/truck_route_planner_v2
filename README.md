@@ -5,7 +5,7 @@
 - เพิ่มการใส่เวลารถออก โดยผู้ใช้ต้องทำการใส่เวลาที่รถออกเป็น format เช่น 10:30 หรือ 11:30 เป็นต้น <br />
 ![1](https://github.com/user-attachments/assets/878ebe46-06db-451f-89e0-d17aa8cfdb27)<br />
 - เพิ่ม Cummulative Distance และ Estimated time arrival (ETA) บน sidebar และในไฟล์ Excel ที่ Export<br />
-![Screenshot 2024-07-27 153206](https://github.com/user-attachments/assets/c19d2253-05d3-4fff-b1d8-0b135d689407)<br />
+![2](https://github.com/user-attachments/assets/eda89e50-da95-4aee-9ac1-a240974efd31)<br />
 ![icon](https://github.com/user-attachments/assets/151ccd08-ee57-4d4c-8076-f6ade0807c13)<br/>
 ![Screenshot 2024-07-27 152717](https://github.com/user-attachments/assets/dab84804-ec52-4d34-9e26-b62b3c4793ab)<br />
 ## การใช้งาน ต้องตามตามลำดับขึ้นดังนี้
