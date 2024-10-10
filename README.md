@@ -21,15 +21,15 @@
 ![key2](https://github.com/user-attachments/assets/74576b16-e713-443d-b99f-0bdb2a479fdb)<br/>
 ### 4 Generate HTML Map
 - หลังจาก Select Excel ให้ทำการกดปุ่ม Generate HTML Map
-![ors](https://github.com/user-attachments/assets/91f0628f-4d20-4dba-838f-de75216078ca)<br/>
+![4](https://github.com/user-attachments/assets/379e567e-46b6-4055-ae24-38826346eb3f)<br/>
 ### 5 Export Excel: 
 - หลังจาก Select Excel จะสามารถ Export ไฟล์เป็น excel โดยในแต่ละ sheet จะเป็นข้อมูล order ของรถบรรทุกแต่ละคัน
 ![export](https://github.com/user-attachments/assets/cab7b66c-8593-49b9-8d05-2cfbbced852a)<br/>
-![exc](https://github.com/user-attachments/assets/39a8eb33-7c0d-4864-a889-e082b90805f2)<br />
+![5](https://github.com/user-attachments/assets/b8848016-1cdd-4cda-8b12-6eddd3317b13)<br />
 ### 6 CtkOptionMenu:
 - หลังจากที่เรา Generate HTML Map เราจะสามารถเลือกกรองแค่เส้นทางของรถคันนั้น ๆ ได้ตามจำนวนรถทั้งหมด โดยหากทำการเลือก Truck 1 ก็จะแสดงผลเส้นทางเพียงแค่ Truck 1<br />
 ![tru](https://github.com/user-attachments/assets/93c007e6-6747-4bf4-a4f1-57e2f08313fb)<br />
-![Screenshot 2024-07-24 130930](https://github.com/user-attachments/assets/a3f5a243-34f4-43d7-864d-346fb513e937)
+![6](https://github.com/user-attachments/assets/071a2efb-2f0f-408d-8502-277d79569097)
 
 ## ข้อจำกัด
 - 1. หากลูกค้ามีการปักหมุด lat lng ที่ไม่ใกล้เคียงถนน จะทำให้โปรแกรมไม่สามารถหาเส้นทางที่ไปยังจุดนั้น ๆ ได้จะทำให้เกิด Bug ที่จะไม่แสดงเส้นทางและเวลาของรถบรรทุกคันที่บรรทุก order ชิ้นนั้น ๆ
